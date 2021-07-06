@@ -1,2 +1,2 @@
-# RS1
+# RSA Intern Bootcamp
 FizzBuzz in TS
