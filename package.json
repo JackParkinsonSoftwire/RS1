@@ -1,0 +1,25 @@
+{
+  "name": "rs1",
+  "version": "1.0.0",
+  "description": "FizzBuzz program",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node FizzBuzz.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JackParkinsonSoftwire/RS1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JackParkinsonSoftwire/RS1/issues"
+  },
+  "homepage": "https://github.com/JackParkinsonSoftwire/RS1#readme",
+  "devDependencies": {
+    "@types/node": "^16.0.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  }
+}
