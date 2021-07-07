@@ -1,4 +1,5 @@
 import Account from "./Accounts";
+const moment = require("moment");
 
 export default class Transaction {
     date: Date;
@@ -7,7 +8,7 @@ export default class Transaction {
     description: string;
     amount: number;
     constructor(transactionStrings: string[], allAccounts: Map<string, Account>) {
-        this.date = new Date(transactionStrings[0]);
+        this.date = moment(transactionStrings[0], "DD/MM/YYYY").toDate();
         this.from = allAccounts.get(transactionStrings[1])
         this.to = allAccounts.get(transactionStrings[2])
         this.description = transactionStrings[3];

@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { exit } from 'process';
 import Account from "./Accounts";
 import Transaction from "./Transactions";
 
@@ -33,18 +34,15 @@ class TransactionManager {
         //People are in cols 1 and 2 -- fetch and remove duplicates to determine accounts
         //CREATE ACCOUNTS
         let accountsInTransactions: string[] = [transactionString[1], transactionString[2]];
-        for (var account in accountsInTransactions) {
+        for (var account of accountsInTransactions) {
             if (!this.allAccounts.has(account)){
                 this.allAccounts.set(account, new Account(account));
             }
         }
 
-        console.log(transactionString);
-        console.log(this.allAccounts);
-
         //Credit and debit accounts based on transaction
-        this.allAccounts.get(transactionString[1])?.credit(Number(transactionString[-1]));
-        this.allAccounts.get(transactionString[2])?.debit(Number(transactionString[-1]));
+        this.allAccounts.get(transactionString[1])?.credit(Number(transactionString[4]));
+        this.allAccounts.get(transactionString[2])?.debit(Number(transactionString[4]));
 
         var transaction = new Transaction(transactionString, this.allAccounts);
         this.allTransactions.push(transaction);
@@ -101,23 +99,35 @@ class TransactionManager {
 
 
     public listAll(): void {
-        for (var entry in this.allAccounts.entries()){
-            console.log("Name: ${entry[0]} \tBalance: ${entry[1]}");
-        }
+        console.log("All accounts on file:");
+        console.log();
+        console.log("Name      Balance");
+        Array.from(this.allAccounts.values()).forEach(acc => console.log(
+            acc.name.padEnd(10, " ")
+            + "£" + acc.balance.toFixed(2)
+        ));
     }
 
     public listAccount(accountName: string){
         var accountTryToFetch: Account | undefined = this.allAccounts.get(accountName);
-        if (accountTryToFetch === undefined) { return }
+        if (accountTryToFetch === undefined) { console.log("Sorry, that person does not exist"); return; }
         else {var accountToFetch: Account = accountTryToFetch}
+        console.log();
+        console.log("All transactions for " + accountName + ":");
+
         var allTransactionsFromAccountSorted: Transaction[] = this.allTransactions
             .filter(transaction => transaction.from === accountToFetch || transaction.to === accountToFetch)
             .sort((a,b) => a.date.getTime() - b.date.getTime());
+        console.log();
+        console.log("Type    Amount  Date              Description")
         allTransactionsFromAccountSorted.forEach((transaction) =>  
                 console.log((transaction.from === undefined ? "?" : 
-                    transaction.from.name === accountName ? "Credit": "Debit") 
-                + String(transaction.amount)
-                + transaction.date.toDateString()
+                    transaction.from.name === accountName ? "Credit  ": "Debit   ") 
+                + "£"
+                + String(transaction.amount).padEnd(4, "0").padEnd(6, " ")
+                + " "
+                + transaction.date.toDateString().padEnd(17, " ")
+                + " "
                 + transaction.description));
     }
 
@@ -126,21 +136,17 @@ class TransactionManager {
      */
     public start() {
         const askForTransactionData = () => rl.question('How can I help you today? >', (response:string) => {
-            if (response.toUpperCase() === "LIST ALL") {
+            if (response === "LIST ALL") {
                 this.listAll();
             } else if (response.includes("LIST ")) {
                 this.listAccount(response.split("LIST ")[1]);
-            } else if (response.includes("QUIT")) {
-                return;
             }
-            rl.close();
+            console.log();
+            askForTransactionData();
           });
-        while (true) {
-            askForTransactionData()
-        }
+        askForTransactionData();
     }
 }
 
-var thing = new TransactionManager();
-//thing.listAll;
-//thing.listAccount("Tim L");
+var TM = new TransactionManager();
+TM.start()
