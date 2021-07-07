@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node FizzBuzz.ts"
+    "startRS1": "ts-node RS1/FizzBuzz.ts",
+    "startRS2": "ts-node RS2/TransactionManager.ts"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,8 @@
     "@types/node": "^16.0.0",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "luxon": "^1.27.0"
   }
 }
