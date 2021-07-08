@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import Account from "./Accounts";
 import Transaction from "./Transactions";
 import { configure, getLogger } from "log4js";
@@ -6,6 +6,7 @@ import sxml = require("sxml");
 import XML = sxml.XML;
 import XMLList = sxml.XMLList;
 import JSONTransaction from './TransactionJSONObject';
+import TransactionsAndAccounts from './TransactionsAccounts';
 
 configure({
     appenders: {
@@ -166,6 +167,28 @@ class TransactionManager {
 
 
 
+    public importFile(fileName:string) {
+        let extension:string = fileName.split(".")[1];
+        try {
+            const fileToOpen = readFileSync(fileName, "utf-8");
+            if (extension === "csv") {
+                this.parseAndApplyCSVTransactions(fileToOpen);
+            } else if (extension === "json") {
+                this.parseAndApplyJSONTransactions(fileToOpen);
+            } else {
+                this.parseAndApplyXMLTransactions(fileToOpen);
+            }
+        } catch (e) {
+            console.log(e);
+            console.log("An error occured. This file may not be available. Please try again.");
+            logger.error("A file read error occured.");
+        }
+    }
+
+    public exportFile(fileName:string) {
+        const transactionData: TransactionsAndAccounts = new TransactionsAndAccounts(this.allTransactions, Array.from(this.allAccounts.values()));
+        writeFileSync(fileName, JSON.stringify(transactionData));
+    }
 
 
 
@@ -229,6 +252,10 @@ class TransactionManager {
                 this.listAll();
             } else if (response.includes("LIST ")) {
                 this.listAccount(response.split("LIST ")[1]);
+            } else if (response.includes("IMPORT FILE ")) { 
+                this.importFile(response.split("IMPORT FILE ")[1]);
+            } else if (response.includes("EXPORT FILE ")) {
+                this.exportFile(response.split("EXPORT FILE ")[1]);
             }
             console.log();
             askForTransactionData();
